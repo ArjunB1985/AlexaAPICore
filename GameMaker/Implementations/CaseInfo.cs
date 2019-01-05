@@ -6,8 +6,8 @@ namespace GameMaker.Implementations
 {
     public class CaseInfo
     {
-        public KeyValuePair<string, string> DataElements { get; set; } = new KeyValuePair<string, string>();
-        public string LastAskedSlot;
+        public List<KeyValuePair<string, string>> DataElements { get; set; } = new List<KeyValuePair<string, string>>();
+        public string LastAskedSlot="";
         public string ChildName { get; set; }
         
         public int ChildAge { get; set; }
@@ -29,6 +29,7 @@ namespace GameMaker.Implementations
 
         public List<AdditionalQuestions> AdditionalQuestions { get; set; }
         public bool ModelComplete { get; set; }
+        public bool ErrorFlag { get; set; }
     }
 
     public class AdditionalQuestions
