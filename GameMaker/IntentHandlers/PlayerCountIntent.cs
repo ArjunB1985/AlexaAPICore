@@ -16,15 +16,25 @@ namespace GameMaker.IntentHandlers
         public SkillResponse HandleIntent(IGameController gameMaker, IntentRequest intentRequest, String userId, string sessionId, Logger logger)
         {
             SkillResponse response = new SkillResponse();
+            response.Version = "1.0";
             try {
                
                 if (intentRequest.DialogState == DialogState.Completed)
                 {
                     //ask if players need to be named
                     logger.Debug("in dialog complete");
-                    var x = gameMaker.StartGame(userId, sessionId, Int32.Parse(intentRequest.Intent.Slots["players"].Value), intentRequest.Intent.Slots["gametype"].Resolution.Authorities[0].Values[0].Value.Id);
-                    response.Response=Helpers.GetPlainTextResponseBody( "Game created for " + intentRequest.Intent.Slots["players"].Value + " players", true, "Game Created");
-                    response.Response.ShouldEndSession = true;
+                    if (intentRequest.Intent.Slots["gametype"].Resolution.Authorities[0].Status.Code == "ER_SUCCESS_NO_MATCH")
+                    {
+                        response.Response = Helpers.GetPlainTextResponseBody("Sorry, That was an invalid game type, please try again.", true, "Game creation error");
+                   
+                    }
+                    else
+                    {
+                        var x = gameMaker.StartGame(userId, sessionId, Int32.Parse(intentRequest.Intent.Slots["players"].Value), intentRequest.Intent.Slots["gametype"].Resolution.Authorities[0].Values[0].Value.Id);
+                        response.Response = Helpers.GetPlainTextResponseBody("Game created for " + intentRequest.Intent.Slots["players"].Value + " players", true, "Game Created");
+                    }
+                        response.Response.ShouldEndSession = true;
+
                     logger.Debug("out dialog complete");
                 }
                 else
@@ -42,6 +52,7 @@ namespace GameMaker.IntentHandlers
                     }
                     else
                     {
+                        response.Response = new ResponseBody();
                         response.Response.Card = new SimpleCard()
                         {
                             Content = "Number of players and who wins the game, high scorer or low?",

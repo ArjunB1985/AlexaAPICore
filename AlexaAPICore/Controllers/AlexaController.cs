@@ -41,10 +41,14 @@ namespace AlexaAPICore.Controllers
            
 
         }
+        
+       
+
         [HttpPost, Route("api/alexa")]
         public SkillResponse EntryPoint(SkillRequest alexaRequestInput)
         {
             SkillResponse response = new SkillResponse();
+            response.Version = "1.0";
             //start logging
             try
             {
@@ -52,7 +56,7 @@ namespace AlexaAPICore.Controllers
                 
                 string userId = alexaRequestInput.Context.System.User.UserId;
                 string sessionId = alexaRequestInput.Session.SessionId;
-                response.Version = "1.0";
+               
                 //get last active game for user
                 IGameController gameMaker = new ScoreKeepingGameController();
                 List<Player> players = gameMaker.GetGameScore(alexaRequestInput.Context.System.User.UserId, null);
@@ -77,141 +81,38 @@ namespace AlexaAPICore.Controllers
                         break;
 
                     case "IntentRequest":
-
+                        
                         logger.Debug("intent request in");
                         IntentRequest intentRequest = (IntentRequest)(alexaRequestInput.Request);
-                        switch (intentRequest.Intent.Name)
-                        {
-                            case "playercountintent":
-
-                                logger.Debug("player count request in");
-
-                                PlayerCountIntent intent = new PlayerCountIntent();
-                                return intent.HandleIntent(gameMaker,intentRequest,userId,sessionId,logger);
-
-                            case "setplayernameintent":
-                                if (players == null)
-                                {
-                                    response.Response = new ResponseBody();
-                                    response.Response.Card = new SimpleCard()
-                                    {
-                                        Content = "Sorry, no active game found",
-                                        Title = "Game not found!"
-                                    };
-
-                                    response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Sorry, no active game found" };
-                                    response.Response.ShouldEndSession = true;
-                                    //say no game active
-                                }
-                                else
-                                {
-                                    //first check the request and save any updates
-                                    foreach (var p in players)
-                                    {
-                                        if (intentRequest.Intent.Slots[Helpers.PlayerNameToSlotName(p.PlayerName)].Value != null && p.PlayerAlias != intentRequest.Intent.Slots[Helpers.PlayerNameToSlotName(p.PlayerName)].Value)
-                                        {
-                                            //save it
-                                            p.PlayerAlias = intentRequest.Intent.Slots[Helpers.PlayerNameToSlotName(p.PlayerName)].Value;
-                                            gameMaker.SetPlayerAlias(userId, sessionId, p);
-                                        }
-                                    }
-
-
-                                    Player playerToRename = null;
-                                    //find next player to name
-                                    foreach (var p in players)
-                                    {
-                                        if (p.PlayerState == PlayerState.Active && p.PlayerAlias==p.PlayerName)
-                                        {
-                                            playerToRename = p;
-                                            break;
-
-                                        }
-                                    }
-                                    if (playerToRename != null)
-                                    {
-                                        string slotName = Helpers.PlayerNameToSlotName(playerToRename.PlayerName);
-                                        response.Response = new ResponseBody();
-                                        response.Response.Card = new SimpleCard()
-                                        {
-                                            Content = "Tell me the name for " + playerToRename.PlayerName,
-                                            Title = "Rename players!"
-                                        };
-                                        response.Response.Directives.Add(new DialogElicitSlot(slotName));
-                                        response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Tell me the name of " + playerToRename.PlayerName };
-                                        response.Response.ShouldEndSession = false;
-                                    }
-                                    else
-                                    {
-                                        response.Response = new ResponseBody();
-                                        response.Response.Card = new SimpleCard()
-                                        {
-                                            Content = "Player names are set.",
-                                            Title = "Player names set!"
-                                        };
-
-                                        response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Player names set. You can now add scores as you play." };
-                                        response.Response.ShouldEndSession = true;
-                                    }
-
-                                }
-                                break;
-                            case "scoreintent":
-                                logger.Debug("in score intent");
-                                if (players == null)
-                                {
-                                    response.Response = new ResponseBody();
-                                    response.Response.Card = new SimpleCard()
-                                    {
-                                        Content = "Sorry, no active game found",
-                                        Title = "Game not found!"
-                                    };
-
-                                    response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Sorry, no active game found" };
-                                    response.Response.ShouldEndSession = true;
-                                    //say no game active
-                                }
-                                else
-                                {
-                                    //make score statement
-                                    string statement = string.Empty;
-                                    foreach (var p in players)
-                                    {
-                                        statement += p.PlayerName + ": " + p.PlayerScore + ". ";
-                                    }
-                                    response.Response = new ResponseBody();
-                                    response.Response.Card = new SimpleCard()
-                                    {
-                                        Content = "Your current game is a " + players.Count + " player game. Here are the scores. " + statement
-                                        ,
-                                        Title = "Scores!"
-                                    };
-
-                                    response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Your current game is a " + players.Count + " player game. Here are the scores. " + statement };
-                                    response.Response.ShouldEndSession = true;
-                                    //say score
-                                }
-                                break;
-                            case "playintent":
-                                logger.Debug("in play intent");
-                                if (intentRequest.Intent.Slots.Count != 1)
-                                { //error
-                                }
-                                else
-                                {
-                                    response.Response = new ResponseBody();
-                                    response.Response.Card = new SimpleCard()
-                                    {
-                                        Content = "I heard " + intentRequest.Intent.Slots["players"].Value,
-                                        Title = "Players"
-                                    };
-                                    response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "I heard " + intentRequest.Intent.Slots["players"].Value };
-
-                                }
-
-                                break;
-                        }
+                       
+                        //switch (intentRequest.Intent.Name)
+                        //{
+                            var type = Type.GetType("GameMaker.IntentHandlers." + intentRequest.Intent.Name.Replace('.','_') +", GameMaker, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null");
+                        IIntentHandler handler = (IIntentHandler)Activator.CreateInstance(type);
+                        response= handler.HandleIntent(gameMaker, intentRequest, userId, sessionId, logger);
                         break;
+                    //case "PlayerCountIntent":
+
+                    //            logger.Debug("player count request in");
+
+                    //            handler = new PlayerCountIntent();
+                    //            return handler.HandleIntent(gameMaker,intentRequest,userId,sessionId,logger);
+
+                    //        case "SetPlayerNameIntent":
+                    //            handler = new SetPlayerNameIntent();
+                    //            return handler.HandleIntent(gameMaker, intentRequest, userId, sessionId, logger);
+
+                    //        case "GetScoreIntent":
+                    //            logger.Debug("in score intent");
+                    //            handler = new GetScoreIntent();
+                    //            return handler.HandleIntent(gameMaker, intentRequest, userId, sessionId, logger);
+                    //            //say score
+                        
+                    //        case "playintent":
+                               
+                    //            break;
+                    //    }
+                       
                     case "SessionEndedRequest":
                         response.Response = new ResponseBody();
                         response.Response.Card = new SimpleCard()

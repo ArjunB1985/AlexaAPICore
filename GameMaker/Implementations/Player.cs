@@ -8,10 +8,18 @@ namespace GameMaker.Implementations
         public Guid PlayerId { get; set; }
 
         public int PlayerScore { get; set; }
+        public int PlayerScoreUncommited { get; set; }
 
         public PlayerState PlayerState { get; set; }
 
         public string PlayerAlias { get; set; }
+
+        public char PlayerBookmark { get; set; }
+
+        public DateTime CreateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
+        
+
     }
 
     public enum PlayerState

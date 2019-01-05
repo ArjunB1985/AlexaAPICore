@@ -27,17 +27,10 @@ namespace GameMaker.Implementations
 
         public StatusCode SetPlayerAlias(string userId, string sessionId,Player player)
         {
-            try
-            {
+           
                 playerRepo.Update(player);
                 playerUnitOfWork.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.StackTrace);
-                return StatusCode.Failure;
-            }
-            return StatusCode.Success;
+                return StatusCode.Success;
         }
         public List<Player> GetGameScore(string userId, string sessionId)
         {
@@ -74,7 +67,14 @@ namespace GameMaker.Implementations
 
         public StatusCode SetGameScore(List<Player> players, string userId, string sessionId)
         {
-            throw new NotImplementedException();
+            
+            foreach (var p in players)
+            {
+                playerRepo.Update(p);
+                playerUnitOfWork.SaveChanges();
+                
+            }
+            return StatusCode.Success;
         }
 
    
@@ -99,7 +99,7 @@ namespace GameMaker.Implementations
                 game.Players = new List<Player>();
                 for(int i = 1; i <= numberOfPlayers; i++)
                 {
-                    game.Players.Add(new Player() { PlayerId = Guid.NewGuid(), PlayerName = "Player " + i, PlayerScore = 0, PlayerState = PlayerState.Active, PlayerAlias= "Player " + i });
+                    game.Players.Add(new Player() { PlayerId = Guid.NewGuid(), PlayerName = "Player " + i, PlayerScore = 0, PlayerState = PlayerState.Active, PlayerAlias= "Player " + i , PlayerBookmark=char.MinValue});
                 }
                 game.TurnPlayerId = game.Players.First().PlayerId;
                 game.Gamestate = GameState.Starting;
