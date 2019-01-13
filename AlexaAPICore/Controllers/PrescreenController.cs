@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
 using Alexa.NET.Response.Directive;
+using AlexaApiCoreLibs.Validators;
 using GameMaker.Implementations;
+using GameMaker.IntentHandlers;
 using GameMaker.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NLog;
@@ -17,7 +17,7 @@ using NLog.Targets;
 
 namespace AlexaAPICore.Controllers
 {
-   
+
     [ApiController]
     public class PrescreenController : ControllerBase
     {
@@ -39,6 +39,13 @@ namespace AlexaAPICore.Controllers
         [HttpPost, Route("api/alexa_elig")]
         public SkillResponse Prescreen(SkillRequest alexaRequestInput)
         {
+            AlexaRequestValidationService validator = new AlexaRequestValidationService();
+            SpeechletRequestValidationResult validationResult = validator.ValidateAlexaRequest(alexaRequestInput);
+            if (validationResult != SpeechletRequestValidationResult.OK)
+            {
+                logger.Debug("validation error: " + validationResult.ToString());
+                new Exception("Invalid Request");
+            }
             SkillResponse response = new SkillResponse();
             response.Version = "1.0";
             logger.Debug("Request:" + JsonConvert.SerializeObject(alexaRequestInput.Request));
@@ -49,12 +56,12 @@ namespace AlexaAPICore.Controllers
                 case "LaunchRequest":
 
                     logger.Debug("Launch request in");
-                    Helpers.caseInfo = null;
+                   
                     response.Response = new ResponseBody();
                     response.Response.Card = new SimpleCard()
                     {
                         //                        Content = "Hello! Enjoy your game while I keep the scores. You can tell me to start a game or ask for the score of your current game.",
-                        Content = "Hello!! Welcome to Childcare pre-screening!",
+                        Content = "Hello!! Welcome to Childcare pre-screening! Please note: This is a demo skill to demonstrate voice driven pre-screening process. Outcomes have no real world significance.",
 
                         Title = "Welcome!!"
                     };
@@ -63,33 +70,77 @@ namespace AlexaAPICore.Controllers
 
                     logger.Debug("Launch request out");
                     break;
+                case "SessionEndedRequest":
+                    response.Response = new ResponseBody();
+                    response.Response.Card = new SimpleCard()
+                    {
+                        //                        Content = "Hello! Enjoy your game while I keep the scores. You can tell me to start a game or ask for the score of your current game.",
+                        Content = "Goodbye, have a good day!",
+
+                        Title = "Welcome!!"
+                    };
+                    response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Goodbye, have a good day!" };
+                    response.Response.ShouldEndSession = true;
+                    return response;
                 case "IntentRequest":
                     try
                     {
+                        CaseInfo caseInfo = Helpers.GetCaseInfo(alexaRequestInput.Session.SessionId);
                         IntentRequest intentRequest = (IntentRequest)alexaRequestInput.Request;
-                        if (Helpers.caseInfo == null)
-                        {
-                            Helpers.caseInfo = new CaseInfo();
-                        }
-                        Helpers.caseInfo.AdditionalQuestions = new List<AdditionalQuestions>();
+                        
                         if (intentRequest.Intent.Name == "PreScreen")
                         {
-                            UpdateModel(Helpers.caseInfo, intentRequest.Intent);
-                            string slot = GetNextSlot(Helpers.caseInfo);
-                            ResponseBody body = GetResponseForSlot(slot);
-                            Helpers.caseInfo.LastAskedSlot = slot;
+                            UpdateModel(caseInfo, intentRequest.Intent);
+                            string slot = GetNextSlot(caseInfo);
+                            ResponseBody body = GetResponseForSlot(slot,caseInfo.ChildName);
+                            caseInfo.LastAskedSlot = slot;
                             response.Response = body;
+                            if (body.ShouldEndSession==true)
+                            {
+                                Helpers.RemoveCaseInfo(alexaRequestInput.Session.SessionId);
+                            }
 
                         }
-
+                        if (intentRequest.Intent.Name == "AMAZON.StopIntent")
+                        {
+                            var stophandler = new AMAZON_StopIntent();
+                            var skillresponse= stophandler.HandleIntent(null, null, null, null, logger);
+                            skillresponse.Version = "1.0";
+                            return skillresponse;
+                        }
+                        if (intentRequest.Intent.Name == "AMAZON.FallbackIntent")
+                        {
+                            var fallbackhandler = new AMAZON_FallbackIntent();
+                            var fallbackresponse=fallbackhandler.HandleIntent(null, null, null, null, logger);
+                            fallbackresponse.Version = "1.0";
+                            return fallbackresponse;
+                        }
+                        if (intentRequest.Intent.Name == "AMAZON.CancelIntent")
+                        {
+                            var cancelhandler = new AMAZON_CancelIntent();
+                            var cancellresponse = cancelhandler.HandleIntent(null, null, null, null, logger);
+                            cancellresponse.Version = "1.0";
+                            return cancellresponse;
+                        }
+                        if (intentRequest.Intent.Name == "AMAZON.HelpIntent")
+                        {
+                            var helphandler = new AMAZON_HelpIntent();
+                            var helplresponse = helphandler.HandleIntent(null, null, null, null, logger);
+                            helplresponse.Version = "1.0";
+                            helplresponse.Response.ShouldEndSession = false;
+                            return helplresponse;
+                        }
                         break;
                     }catch(Exception e)
                     {
-                        response.Response = Helpers.GetPlainTextResponseBody(e.Message, true, "error");
+                       
+                        response.Response = Helpers.GetPlainTextResponseBody("Aaargh, the application encountered an error. Please try again later. Sorry for the inconvenience", true, "Error",e.Message);
                         response.Response.ShouldEndSession = true;
                         logger.Debug(e.StackTrace);
                     }
                     break;
+                
+                   
             }
             logger.Debug("Response:" + JsonConvert.SerializeObject(response.Response));
 
@@ -101,6 +152,7 @@ namespace AlexaAPICore.Controllers
             if (caseInfo.LastAskedSlot == null || caseInfo.LastAskedSlot == "")//first time
                 return;
             //verify data capture integrity
+            
             if (intent.Slots[caseInfo.LastAskedSlot].Resolution != null)
             {
                 if (intent.Slots[caseInfo.LastAskedSlot].Resolution.Authorities[0].Status.Code == "ER_SUCCESS_MATCH")
@@ -114,7 +166,7 @@ namespace AlexaAPICore.Controllers
             }
             else
             {
-                if (intent.Slots[caseInfo.LastAskedSlot].Value == "?")
+                if (intent.Slots[caseInfo.LastAskedSlot].Value == "?"|| intent.Slots[caseInfo.LastAskedSlot].Value == null)
                 {
                     caseInfo.ErrorFlag = true;
                 }
@@ -126,13 +178,12 @@ namespace AlexaAPICore.Controllers
 
         }
 
-        private ResponseBody GetResponseForSlot(string slot)
+        private ResponseBody GetResponseForSlot(string slot,string childName)
         {
             ResponseBody body;
             string title="";
             string cardContent="";
             string audiotext="";
-            string childName=Helpers.caseInfo.ChildName;
             bool sessionend = false; ;
             
             switch (slot)
@@ -143,7 +194,7 @@ namespace AlexaAPICore.Controllers
                     
                     break;
                 case "child_name":
-                    audiotext = cardContent = "What is the name of the child you are applying for?";
+                    audiotext = cardContent = "Give me a dummy name for the child you are applying for?";
                     title = "Child's name";
                     break;
                 case "child_age":
@@ -195,33 +246,33 @@ namespace AlexaAPICore.Controllers
                     title = "Child Support Expense";
                     break;
                 case "NE_residence":
-                    audiotext = cardContent = "Sorry! You are not eligible. Child care program requires you to be a resident of Kentucky, and citizen of United States.";
+                    audiotext = cardContent = "Sorry! You are not eligible. Child care program requires you to be a resident of Kentucky, and citizen of United States. Please note: This is a demo skill to demonstrate voice driven pre-screening process. Outcomes have no real world significance.";
                     title = "Pre-screening Results";
                     sessionend = true;
 
                     break;
                 case "NE_child_age":
-                    audiotext = cardContent = "Sorry! You are not eligible. " + childName + " is older than the allowed age for the program.";
+                    audiotext = cardContent = "Sorry! You are not eligible. " + childName + " is older than the allowed age for the program. Please note: This is a demo skill to demonstrate voice driven pre-screening process. Outcomes have no real world significance.";
                     title = "Pre-screening Results";
                     sessionend = true;
                     break;
                 case "NE_assets":
-                    audiotext = cardContent = "Sorry! You are not eligible. You have too much assets to qualify.";
+                    audiotext = cardContent = "Sorry! You are not eligible. You have too much assets to qualify. Please note: This is a demo skill to demonstrate voice driven pre-screening process. Outcomes have no real world significance.";
                     title = "Pre-screening Results";
                     sessionend = true;
                     break;
                 case "NE_work":
-                    audiotext = cardContent = "Sorry! You are not eligible. You do not meet work requirements.";
+                    audiotext = cardContent = "Sorry! You are not eligible. You do not meet work requirements. Please note: This is a demo skill to demonstrate voice driven pre-screening process. Outcomes have no real world significance.";
                     title = "Pre-screening Results";
                     sessionend = true;
                     break;
                 case "NE_income":
-                    audiotext = cardContent = "Sorry! You are not eligible. Your household income is above the limit allowed.";
+                    audiotext = cardContent = "Sorry! You are not eligible. Your household income is above the limit allowed. Please note: This is a demo skill to demonstrate voice driven pre-screening process. Outcomes have no real world significance.";
                     title = "Pre-screening Results";
                     sessionend = true;
                     break;
                 case "EG":
-                    audiotext = cardContent = "Awesome, we are all set. And we have some great news for you! You might be eligible for child care program. Please note, pre-screening results does not guarantee actual eligibility. Please visit your nearest office to apply!! Thank you!!";
+                    audiotext = cardContent = "Awesome, we are all set. And we have some great news for you! You might be eligible for child care program. Please note, pre-screening results does not guarantee actual eligibility. Please visit your nearest office to apply!! Thank you!! Please note: This is a demo skill to demonstrate voice driven pre-screening process. Outcomes have no real world significance.";
                     title = "Pre-screening Results";
                     sessionend = true;
                     break;
@@ -243,6 +294,7 @@ namespace AlexaAPICore.Controllers
             {
                 body.Directives.Add(new DialogElicitSlot(slot));
             }
+           
             return body;
         }
 
@@ -257,7 +309,7 @@ namespace AlexaAPICore.Controllers
                 case "" :
                     return "residence";
                 case "residence": //validate
-                    if (caseInfo.DataElements.First(p => p.Key == "residence").Value.ToLower() == "no")
+                    if (caseInfo.DataElements.First(p => p.Key == "residence").Value.ToLower() != "yes")
                     {
                         //not elig
                         return "NE_residence";
@@ -282,7 +334,7 @@ namespace AlexaAPICore.Controllers
                     }
                     return "assets";
                 case "special_needs":
-                    if (caseInfo.DataElements.First(p => p.Key == "special_needs").Value.ToLower() == "no")
+                    if (caseInfo.DataElements.First(p => p.Key == "special_needs").Value.ToLower() != "yes")
                     {
                         return "NE_child_age";
                     }
@@ -294,7 +346,7 @@ namespace AlexaAPICore.Controllers
                     }
                     return "father_working";
                 case "father_working":
-                    if (caseInfo.DataElements.First(p => p.Key == "father_working").Value.ToLower() == "no")
+                    if (caseInfo.DataElements.First(p => p.Key == "father_working").Value.ToLower() != "yes")
                     {
                         return "father_age";
                     }
@@ -307,13 +359,13 @@ namespace AlexaAPICore.Controllers
                     }
                     return "NE_work";
                 case "father_in_school":
-                    if (caseInfo.DataElements.First(p => p.Key == "father_in_school").Value.ToLower() == "no")
+                    if (caseInfo.DataElements.First(p => p.Key == "father_in_school").Value.ToLower() != "yes")
                     {
                         return "NE_work";
                     }
                     return "mother_working";
                 case "mother_working":
-                    if (caseInfo.DataElements.First(p => p.Key == "mother_working").Value.ToLower() == "no")
+                    if (caseInfo.DataElements.First(p => p.Key == "mother_working").Value.ToLower() != "yes")
                     {
                         return "mother_age";
                     }
@@ -326,7 +378,7 @@ namespace AlexaAPICore.Controllers
                     }
                     return "NE_work";
                 case "mother_in_school":
-                    if (caseInfo.DataElements.First(p => p.Key == "mother_in_school").Value.ToLower() == "no")
+                    if (caseInfo.DataElements.First(p => p.Key == "mother_in_school").Value.ToLower() != "yes")
                     {
                         return "NE_work";
                     }

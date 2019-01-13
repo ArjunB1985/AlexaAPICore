@@ -1,14 +1,56 @@
 ﻿using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
 using GameMaker.Implementations;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Linq;
+using System.Net;
 
 namespace GameMaker.Utils
 {
     public static class Helpers
     {
+        public static string GetGender(string name,string mode,string key)
+        {
+            if (mode != "PROD")
+            {
+                return "E";
+            }
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://gender-api.com/get?key="+key+"&name="+name);
+            try
+            {
+                WebResponse response = request.GetResponse();
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(responseStream, System.Text.Encoding.UTF8);
+                    var responseJSON= reader.ReadToEnd();
+                    GenderResponse root = JsonConvert.DeserializeObject<GenderResponse>(responseJSON);
+                    if (root.accuracy > 80)
+                    {
+                        return root.gender;
+                    }
+                    else
+                    {
+                        return "E";
+                    }
+                }
+            }
+            catch (WebException ex)
+            {
+                WebResponse errorResponse = ex.Response;
+                using (Stream responseStream = errorResponse.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(responseStream, System.Text.Encoding.GetEncoding("utf-8"));
+                    String errorText = reader.ReadToEnd();
+                    // log errorText
+                }
+                throw;
+            }
+        }
+
+        private static List<KeyValuePair<string, CaseInfo>> CaseInfoCollection { get; set; } = new List<KeyValuePair<string, CaseInfo>>();
         public static string PlayerNameToSlotName(string playerName)
         {
             string number = playerName.Trim().Substring(7);
@@ -38,7 +80,29 @@ namespace GameMaker.Utils
                     throw new Exception("Invalid player name");
             }
         }
-        public static CaseInfo caseInfo = new CaseInfo();
+        private static CaseInfo caseInfo = new CaseInfo();
+        public static CaseInfo GetCaseInfo(string sessionid)
+        {
+            //housekeeping clear any old sessions
+            
+            CaseInfoCollection.RemoveAll(p => p.Value.CreateDateTime.AddHours(1.0) < DateTime.Now);
+
+            if (CaseInfoCollection.Select(p => p.Key).Contains(sessionid))
+            {
+                return CaseInfoCollection.First(p => p.Key == sessionid).Value;
+            }
+            else
+            {
+                var info = new KeyValuePair<string, CaseInfo>(sessionid, new CaseInfo() { CreateDateTime = DateTime.Now });
+                CaseInfoCollection.Add(info);
+                return info.Value;
+            }
+        }
+        public static void RemoveCaseInfo(string sessionid)
+        {
+            CaseInfoCollection.RemoveAll(p => p.Key == sessionid);
+        }
+
         public static ResponseBody GetPlainTextResponseBody(string text, bool needCard, string title = null, string cardText = null)
         {
             ResponseBody body = new ResponseBody();
@@ -59,83 +123,10 @@ namespace GameMaker.Utils
             return body;
 
         }
-        public static EligibilityResult EvaluateEligibility()
-        {
-            var result = new EligibilityResult();
-            if (caseInfo.ChildAge > 13 && caseInfo.SpecialNeeds == false)
-            {
-                result.Pass = false;
-                result.FailReason = "Child age is more than the limit for the program.";
-                return result;
-            }
-            if (caseInfo.Residence == false)
-            {
-                result.Pass = false;
-                result.FailReason = "You are not resident of Kentucky or citizen of US.";
-                return result;
-            }
-            if (caseInfo.Assets == true)
-            {
-                result.Pass = false;
-                result.FailReason = "You have too much assets to qualify.";
-                return result;
-            }
-            //income
-            int netincome = caseInfo.Income + caseInfo.IncomeOther - caseInfo.Expense;
-            if (netincome > 2771)
-            {
-                result.Pass = false;
-                result.FailReason = "You have more income than required to qualify.";
-                return result;
-            }
-            if (caseInfo.FatherAge > 20 && caseInfo.MotherAge > 20 && !caseInfo.FatherWorking && !caseInfo.MotherWorking)
-            {
-                result.Pass = false;
-                result.FailReason = "You are not meeting work requirements.";
-                return result;
-            }
-            if ((caseInfo.FatherAge < 20 && !caseInfo.FatherInSchool))
-            {
-                result.Pass = false;
-                result.FailReason = "You are not meeting work requirements.";
-                return result;
-            }
-            if (caseInfo.MotherAge < 20 && !caseInfo.MotherInSchool)
-            {
-                result.Pass = false;
-                result.FailReason = "You are not meeting work requirements.";
-                return result;
-            }
-            result.Pass = true;
-            return result;
-        }
-
-        public static void LoadModel(IntentRequest intentRequest)
-        {
-            CaseInfo caseInfo = new CaseInfo();
-            caseInfo.ChildName = intentRequest.Intent.Slots["child_name"].Value;
-            caseInfo.ChildAge = Int32.Parse(intentRequest.Intent.Slots["child_age"].Value);
-            caseInfo.SpecialNeeds = (intentRequest.Intent.Slots["special_needs"].Value.ToLower() == "yes");
-            caseInfo.Residence = intentRequest.Intent.Slots["residence"].Value.ToLower() == "yes";
-            caseInfo.Assets = intentRequest.Intent.Slots["assets"].Value.ToLower() == "yes";
-            caseInfo.FatherAge = Int32.Parse(intentRequest.Intent.Slots["father_age"].Value);
-            caseInfo.MotherAge = Int32.Parse(intentRequest.Intent.Slots["mother_age"].Value);
-            caseInfo.MotherWorking = intentRequest.Intent.Slots["mother_working"].Value.ToLower() == "yes";
-            caseInfo.FatherWorking = intentRequest.Intent.Slots["father_working"].Value.ToLower() == "yes";
-            caseInfo.Income = Int32.Parse(intentRequest.Intent.Slots["income_job"].Value);
-            caseInfo.IncomeOther = Int32.Parse(intentRequest.Intent.Slots["income_other"].Value);
-            caseInfo.Expense = Int32.Parse(intentRequest.Intent.Slots["expense"].Value);
-            caseInfo.FatherInSchool = intentRequest.Intent.Slots["father_in_school"].Value!=null && intentRequest.Intent.Slots["father_in_school"].Value.ToLower()=="yes";
-            caseInfo.MotherInSchool = intentRequest.Intent.Slots["mother_in_school"].Value != null && intentRequest.Intent.Slots["mother_in_school"].Value.ToLower() == "yes";
-
-            if (Helpers.caseInfo != null)
-            {
-                caseInfo.AdditionalQuestions = Helpers.caseInfo.AdditionalQuestions;
-            }
-            Helpers.caseInfo = caseInfo;
-        }
+        
     }
 
+    
     public class EligibilityResult
     {
         public bool Pass { get; set; }
