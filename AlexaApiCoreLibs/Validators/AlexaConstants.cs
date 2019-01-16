@@ -22,6 +22,7 @@ namespace AlexaApiCoreLibs.Validators
         public const string Key = "hfDQHLVANjyCEjnqKK";
         public const string ApplicationID1 = "amzn1.ask.skill.17cce22d-34c5-4f59-b0f1-4f04c58f0d8b";
         public const string ApplicationID2 = "amzn1.ask.skill.ca6f52e9-a1ce-4bd8-abc9-babb9d6eb063";
+        public const string ApplicationID3 = "amzn1.ask.skill.770117b4-75d2-4a9e-890c-e44b1bae28a2";
         public static JsonSerializerSettings DeserializationSettings = new JsonSerializerSettings
         {
             MissingMemberHandling = MissingMemberHandling.Ignore

@@ -45,7 +45,8 @@ namespace AlexaApiCoreLibs.Validators
         private bool VerifyApplicationIdHeader(SkillRequest alexaRequest)
         {
             return alexaRequest.Session.Application.ApplicationId.Equals(AlexaConstants.ApplicationID1) ||
-                alexaRequest.Session.Application.ApplicationId.Equals(AlexaConstants.ApplicationID2);
+                alexaRequest.Session.Application.ApplicationId.Equals(AlexaConstants.ApplicationID2)||
+                alexaRequest.Session.Application.ApplicationId.Equals(AlexaConstants.ApplicationID3);
         }
     }
 }

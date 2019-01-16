@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameMaker.Utils;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,6 +18,8 @@ namespace GameMaker.Implementations
         public bool ErrorFlag { get; set; }
         public string Gender { get; set; }
         public string EligibilityGroup { get; set; }
+        public DateTime Appointment { get; set; }
+        public UserProfile profile { get; set; }
     }
 
     public class AdditionalQuestions

@@ -48,6 +48,7 @@ namespace AlexaAPICore
             {
                 app.UseHsts();
             }
+            app.UseStaticFiles();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

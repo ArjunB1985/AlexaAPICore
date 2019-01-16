@@ -55,13 +55,13 @@ namespace AlexaApiCoreLibs.Validators
         public static bool VerifyRequestSignature(
             byte[] serializedSpeechletRequest, string expectedSignature, string certChainUrl,Logger logger)
         {
-            logger.Debug("In Verify Sig");
+           // logger.Debug("In Verify Sig");
             string certCacheKey = _getCertCacheKey(certChainUrl);
             X509Certificate cert = MemoryCache.Default.Get(certCacheKey) as X509Certificate;
             if (cert == null ||
                 !CheckRequestSignature(serializedSpeechletRequest, expectedSignature, cert,logger))
             {
-                logger.Debug("Inside if getting cert");
+               // logger.Debug("Inside if getting cert");
                 // download the cert 
                 // if we don't have it in cache or
                 // if we have it but it's stale because the current request was signed with a newer cert
@@ -75,7 +75,7 @@ namespace AlexaApiCoreLibs.Validators
                 
                 MemoryCache.Default.Set(certCacheKey, cert, _policy);
             }
-            logger.Debug(CheckRequestSignature(serializedSpeechletRequest, expectedSignature, cert, logger));
+          //  logger.Debug(CheckRequestSignature(serializedSpeechletRequest, expectedSignature, cert, logger));
             return CheckRequestSignature(serializedSpeechletRequest, expectedSignature, cert, logger);
         }
 
@@ -178,7 +178,7 @@ namespace AlexaApiCoreLibs.Validators
         /// </summary>
         public static bool CheckRequestSignature(byte[] serializedSpeechletRequest, string expectedSignature, X509Certificate cert, Logger logger)
         {
-            logger.Debug("In CheckRequestSignature");
+           // logger.Debug("In CheckRequestSignature");
             byte[] expectedSig = null;
             try
             {
@@ -186,7 +186,7 @@ namespace AlexaApiCoreLibs.Validators
             }
             catch (FormatException)
             {
-                logger.Debug("format exception");
+               // logger.Debug("format exception");
                 return false;
             }
 
@@ -195,7 +195,7 @@ namespace AlexaApiCoreLibs.Validators
             var signer = Org.BouncyCastle.Security.SignerUtilities.GetSigner(AlexaConstants.SIGNATURE_ALGORITHM);
             signer.Init(false, publicKey);
             signer.BlockUpdate(serializedSpeechletRequest, 0, serializedSpeechletRequest.Length);
-            logger.Debug("out CheckRequestSignature");
+           // logger.Debug("out CheckRequestSignature");
             return signer.VerifySignature(expectedSig);
         }
 

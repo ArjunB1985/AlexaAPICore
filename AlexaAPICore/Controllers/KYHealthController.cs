@@ -54,21 +54,21 @@ namespace AlexaAPICore.Controllers
 
                 case "LaunchRequest":
 
-                    logger.Debug("Launch request in");
+                 //   logger.Debug("Launch request in");
 
                     response.Response = new ResponseBody();
                     response.Response.Card = new SimpleCard()
                     {
-                        Content = "Hello!! Welcome to Kentucky Health eligibility finder! Let's discuss a few questions today, and see what types of requirements and benefits you may have through the Kentucky HEALTH program. When ready, say, \"I am ready!\".",
+                        Content = "Hello!! Welcome to the Kentucky Health eligibility finder! Lets answer a few questions together to see the benefits you could have through the Kentucky HEALTH program. Say \"I am ready\" when ready to start.",
 
                         Title = "Welcome!!"
                     };
                     response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Hello!! Welcome to Kentucky Health eligibility finder! Lets answer a few questions together and see what types of requirements and benefits you may have through the Kentucky HEALTH program. When ready, say, \"I am ready!\"" };
                     //response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Hello!! say, \"I am ready!\"" };
-
+                    response.Response.Reprompt = new Reprompt("Please say, I am ready.");
                     response.Response.ShouldEndSession = false;
 
-                    logger.Debug("Launch request out");
+                  //  logger.Debug("Launch request out");
                     break;
                 case "SessionEndedRequest":
                     response.Response = new ResponseBody();
@@ -166,54 +166,48 @@ namespace AlexaAPICore.Controllers
             { 
               //  
                 case "EG_Child":
-                    text= "If you are considered part of the Children Kentucky HEALTH eligibility group, there will be no changes to your requirements. " +
-                "Your Medicaid benefits WILL NOT CHANGE. Dental and vision services will still be covered by your Managed Care Organization. Non-emergency medical transportation costs will be paid by the Commonwealth. " +
-                "You DO NOT have any new out-of-pocket costs for health services. " +
-                "You are NOT REQUIRED to complete PATH Community Engagement activities. " +
-                "You DO NOT have access to a My Rewards Account. " +
-                "Thanks for using Kentucky Health Eligibility Finder. <Name>, you have a good day.";
+                    text= "If you are considered part of the Children eligibility group within Kentucky HEALTH, " +
+                        "there will be no changes to your requirements. For more specific information concerning your " +
+                        "requirements and benefits through Kentucky HEALTH, please visit us online at KentuckyHEALTH.ky.gov. " +
+                        "Thanks for using the Kentucky HEALTH Eligibility Finder, <Name>. Have a great day!";
             break;
                 case "EG_Pregnant":
-                    text = "If you are considered part of the Pregnant Women Kentucky HEALTH eligibility group, there will be some changes to your requirements. " +
-                        "Your Medicaid benefits WILL NOT CHANGE. Dental and vision services will still be covered by your Managed Care Organization until 60 days after the end of your pregnancy. Non-emergency medical transportation costs will be paid by the Commonwealth. " +
-                        "You DO NOT have any out-of-pocket costs for health services. " +
-                        "You are NOT REQUIRED to complete PATH Community Engagement activities while you are pregnant and until 60 days after the end of your pregnancy. " +
-                        "If you are at least 19 years old, you WILL HAVE access to your My Rewards Account without needing to pay premiums. " +
-                        "Thanks for using Kentucky Health Eligibility Finder. <Name>, you have a good day.";
+                    text = "If you are considered part of the Pregnant Women eligibility group within Kentucky HEALTH, " +
+                        "there will be some changes to your requirements including access to your My Rewards Account, " +
+                        "but your Medicaid benefits will not change. Also, you are not required to complete PATH Community " +
+                        "Engagement activities while pregnant and until 60 days after your pregnancy. For more specific information " +
+                        "concerning your requirements and benefits through Kentucky HEALTH, please visit us online at KentuckyHEALTH.ky.gov. " +
+                        "Thanks for using the Kentucky HEALTH Eligibility Finder, <Name>. Have a great day!";
                     break;
                 case "EG_FosterYouth":
-                    text = "If you are considered part of the Former Foster Youth (up to age 26) Kentucky HEALTH eligibility group, there will be some changes to your requirements. " +
-                        "Your Medicaid benefits WILL NOT CHANGE. Dental and vision services will still be covered by your Managed Care Organization. Non-emergency medical transportation costs will be paid by the Commonwealth. " +
-                        "Out-of-pocket costs are OPTIONAL. You may choose to pay premiums each month to your Managed Care Organization if you want to use your My Rewards Account. If you choose not to pay premiums to your MCO, you will not have access to your My Rewards Account. " +
-                        "You are NOT REQUIRED to complete PATH Community Engagement activities. " +
-                        "You MAY HAVE access to a My Rewards Account if you pay a premium each month to your Managed Care Organization. " +
-                        "Thanks for using Kentucky Health Eligibility Finder. <Name>, you have a good day.";
+                    text = "If you are considered part of the Former Foster Youth eligibility group within Kentucky HEALTH, " +
+                        "there will be some changes to your requirements, but your Medicaid benefits will not change. " +
+                        "You are not required to complete PATH Community Engagement activities, and you may have access to your " +
+                        "My Rewards Account. For more specific information concerning your requirements and benefits through Kentucky HEALTH," +
+                        " please visit us online at KentuckyHEALTH.ky.gov. Thanks for using the Kentucky HEALTH Eligibility Finder, <Name>. " +
+                        "Have a great day!";
                     break;
                 case "EG_MedicallyFrail":
-                    text = "If you are considered part of the Medically Frail group, there will be some changes to your requirements. " +
-                        "Your Medicaid benefits WILL NOT CHANGE. Dental and vision services will still be covered by your Managed Care Organization. Non-emergency medical transportation costs will be paid by the Commonwealth. " +
-                        " Out-of-pocket costs are OPTIONAL. You may choose to pay premiums each month to your Managed Care Organization if you want to use your My Rewards Account. If you choose not to pay premiums to your MCO, you will not have access to your My Rewards Account. " +
-                        "You are NOT REQUIRED to complete PATH Community Engagement activities. " +
-                        "You MAY HAVE access to a My Rewards Account if you pay a premium each month to your Managed Care Organization. " +
-                        "Thanks for using Kentucky Health Eligibility Finder. <Name>, you have a good day.";
+                    text = "If you are considered part of the Medically Frail eligibility group within Kentucky HEALTH, " +
+                        "there will be some changes to your requirements, but your Medicaid benefits will not change. " +
+                        "You are not required to complete PATH Community Engagement activities, and you may have access to your My Rewards Account." +
+                        " For more specific information concerning your requirements and benefits through Kentucky HEALTH, please visit us online at KentuckyHEALTH.ky.gov. " +
+                        "Thanks for using the Kentucky HEALTH Eligibility Finder, <Name>. Have a great day!";
                     break;
                
 
                 case "EG_IncomeEligParents":
-                    text = "If you are considered part of the Income-Eligible Parent/Guardian Kentucky HEALTH eligibility group, there will be some changes to your requirements. " +
-                        "Your Medicaid benefits WILL NOT CHANGE. Dental and vision services will still be covered by your Managed Care Organization. Non-emergency medical transportation costs will be paid by the Commonwealth. " +
-                        "You are REQUIRED to pay premiums each month to your Managed Care Organization. Based on the income you reported, your premium will probably be $1 per month, but you will get the official amount from your MCO (it will be between $1 and $15). If you do not pay the premium, you will be REQUIRED to pay copays for each of your services when you go to the doctor or get a prescription. " +
-                        "You are REQUIRED to complete 80 hours of PATH Community Engagement activities each month. However, PATH Community Engagement MAY NOT be required if you report that you are a full-time student or a primary caregiver of a dependent child. " +
-                        "You MAY HAVE access to a My Rewards Account if you pay a premium each month to your Managed Care Organization and meet your PATH Community Engagement requirement (unless exempt). " +
-                        "Thanks for using Kentucky Health Eligibility Finder. <Name>, you have a good day.";
+                    text = "If you are considered part of the Income Eligible Parents eligibility group within Kentucky HEALTH, there will be some changes to your requirements, " +
+                        "but your Medicaid benefits will not change. You are required to complete 80 hours of PATH Community Engagement activities, and are required to pay monthly premiums to your MCO . " +
+                        "For more specific information concerning your requirements and benefits through Kentucky HEALTH, please visit us online at KentuckyHEALTH.ky.gov. " +
+                        "Thanks for using the Kentucky HEALTH Eligibility Finder, <Name>. Have a great day!";
                     break;
                 case "EG_IncEligAdult":
-                    text = "If you are considered part of the Income-Eligible Adults Kentucky HEALTH eligibility group, there will be some changes to your requirements. " +
-                        "Many medical benefits are still covered by your Managed Care Organization. However, non-medical dental and vision services are covered through your My Rewards Account, NOT your Managed Care Organization. In addition, non-emergency medical transportation costs will NOT be paid for by the Commonwealth. " +
-                        "You are REQUIRED to pay premiums each month to your Managed Care Organization. The monthly premium amount will be between $1 and $15 for the first two years. If you do not pay the premium, you will be REQUIRED to pay copays for each of your services when you go to the doctor or get a prescription or you MAY BE SUSPENDED from Kentucky HEALTH, depending on your income level. " +
-                        "You are REQUIRED to complete 80 hours of PATH Community Engagement activities each month. However, PATH Community Engagement MAY NOT be required if you report that you are a full-time student or a primary caregiver of a dependent child. " +
-                        "You MAY HAVE access to a My Rewards Account if you pay a premium each month to your Managed Care Organization and meet your PATH Community Engagement requirement (unless exempt). The money in your My Rewards Account can be used to pay for non-medical vision and dental services. " +
-                        "Thanks for using Kentucky Health Eligibility Finder. <Name>, you have a good day.";
+                    text = "If you are considered part of the Income Eligible Adult eligibility group within Kentucky HEALTH, " +
+                        "there will be some changes to your requirements. Non-medical dental and vision services will now be covered through your My Rewards Account. " +
+                        "You are required to complete 80 hours of PATH Community Engagement activities, and are required to pay monthly premiums to your MCO . " +
+                        "For more specific information concerning your requirements and benefits through Kentucky HEALTH, please visit us online at KentuckyHEALTH.ky.gov. " +
+                        "Thanks for using the Kentucky HEALTH Eligibility Finder, <Name>. Have a great day! ";
                     break;
                
             
@@ -232,7 +226,7 @@ namespace AlexaAPICore.Controllers
             {
                 if (intent.Slots[caseInfo.LastAskedSlot].Resolution.Authorities[0].Status.Code == "ER_SUCCESS_MATCH")
                 {
-                    caseInfo.DataElements.Add(new KeyValuePair<string, string>(caseInfo.LastAskedSlot, intent.Slots[caseInfo.LastAskedSlot].Value));
+                    caseInfo.DataElements.Add(new KeyValuePair<string, string>(caseInfo.LastAskedSlot, intent.Slots[caseInfo.LastAskedSlot].Resolution.Authorities[0].Values[0].Value.Id));
                 }
                 else
                 {
@@ -264,10 +258,13 @@ namespace AlexaAPICore.Controllers
             switch (slot)
             {
                 case "consent":
-                    audiotext = cardContent = "Great!! Lets get started. I will now read you a short consent statement, please confirm if you agree, or ask me to repeat.  \"You understand this is not an official determination of your eligibility for Kentucky HEALTH. You also understand that to know your Kentucky HEALTH eligibility group, you can refer to the notice about your Medicaid coverage that you received in the mail, visit benefind.ky.gov, or go to your local D.C.B.S. office.\" Do you agree?";
-                    //audiotext = cardContent = "Consent, Do you agree?";
+                  //  audiotext = cardContent = "Great!! Lets get started. I will now read you a short consent statement, please confirm if you agree, or ask me to repeat.  \"You understand this is not an official determination of your eligibility for Kentucky HEALTH. You also understand that to know your Kentucky HEALTH eligibility group, you can refer to the notice about your Medicaid coverage that you received in the mail, visit benefind.ky.gov, or go to your local D.C.B.S. office.\" Do you agree?";
+                    audiotext = cardContent = "Great!!Lets get started. Before we begin, please agree to the following statement:  I understand this is not an official determination of my eligibility for Kentucky HEALTH. I also understand that to know my Kentucky HEALTH eligibility group, I can refer to the notice about my Medicaid coverage that I received in the mail, visit benefind.ky.gov, or go to my local DCBS office. Do you agree ?";
 
-                    title = "Consent";
+
+                  //audiotext = cardContent = "Consent, Do you agree?";
+
+                  title = "Consent";
 
                     break;
                 case "name":
@@ -283,7 +280,8 @@ namespace AlexaAPICore.Controllers
                     title = "Gender";
                     break;
                 case "hh_members":
-                    audiotext = cardContent = "Including you, how many members are in your household?";
+                    audiotext = cardContent = "Great; including you, " +
+                        "how many people are in your household? These are the individuals who you file your taxes with. ";
                     title = "Household size";
                     break;
                 case "income":
@@ -291,7 +289,7 @@ namespace AlexaAPICore.Controllers
                     title = "Household Income";
                     break;
                 case "blind_dis":
-                    audiotext = cardContent = "<Name>, Does any of these apply to you, you can reply in, Yes or No, or say Repeat. Are you blind or disabled ?";
+                    audiotext = cardContent = "<Name>, Does any of the following questions apply to you? You can reply, \"Yes\", \"No\", or ask me to Repeat. Are you blind or disabled ?";
                     title = "Disablility & Blindness";
                     break;
                 case "medicare":
@@ -299,19 +297,19 @@ namespace AlexaAPICore.Controllers
                     title = "Medicare";
                     break;
                 case "nursing":
-                    audiotext = cardContent = "Residing in nursing facility or Intermediate Care Facilities?"; 
+                    audiotext = cardContent = "Do you reside in nursing facility or Intermediate Care Facilities?"; 
                     title = "Nursing";
                     break;
                 case "foster":
-                    audiotext = cardContent = "Receiving foster care or subsidized adoption?";
+                    audiotext = cardContent = "Are you currently in foster care or subsidized adoption?";
                     title = "Foster care";
                     break;
                 case "cancer":
-                    audiotext = cardContent = "Participant in the Breast and Cervical Cancer Treatment Program?";
+                    audiotext = cardContent = "Are you a participant in the Breast and Cervical Cancer Treatment Program?";
                     title = "Cancer Treatment Program";
                     break;
                 case "ssi":
-                    audiotext = cardContent = "Are you SSI recipient?"; ;
+                    audiotext = cardContent = "Do you receive Supplemental Security Income?"; ;
                     title = "SSI Recipient";
                     break;
                 case "buyin":
@@ -319,15 +317,15 @@ namespace AlexaAPICore.Controllers
                     title = "Medicaid buy-in program";
                     break;
                 case "hcbs":
-                    audiotext = cardContent = "Are you recipient of Home and Community Based Service Waiver?";
+                    audiotext = cardContent = "Are you a recipient of Home and Community Based Service Waiver?";
                     title = "Home and Community Based Service Waiver";
                     break;
                 case "preg":
-                    audiotext = cardContent = "<Name>, are you pregnant OR has your pregnancy ended within the last 60 days? ";
+                    audiotext = cardContent = "<Name>, are you pregnant OR have you been pregnant within the last 60 days? ";
                     title = "Pregnancy";
                     break;
                 case "foster_eighteen":
-                    audiotext = cardContent = "Since you are younger than 26, tell me if you were in foster care on your 18th birthday?";
+                    audiotext = cardContent = "Since you are younger than 26, were you in foster care on your 18th birthday?";
                     title = "Foster Youth";
                     break;
                 case "ltc":
@@ -335,7 +333,7 @@ namespace AlexaAPICore.Controllers
                     title = "Long Term Care";
                     break;
                 case "special_needs":
-                    audiotext = cardContent = "Do you currently need help every day with activities of daily living (including toileting, bathing, dressing, preparing meals, walking in the home or outside, or walking more than 20 feet)?";
+                    audiotext = cardContent = "Do you currently need help every day with activities of daily living ?";
                     title = "Special Needs";
                     break;
                 case "homeless":
@@ -344,7 +342,7 @@ namespace AlexaAPICore.Controllers
                     break;
                     
                 case "guardian":
-                    audiotext = cardContent = "Thanks for your patience, and here comes the last question. Are you a parent or guardian of a child age 18 or younger?";
+                    audiotext = cardContent = "Thanks for your patience. Here is the last question: Are you a parent or guardian of a child age 18 or younger?";
                     title = "Child Support Expense";
                     break;
                
@@ -358,54 +356,50 @@ namespace AlexaAPICore.Controllers
                     break;
                 case "EG_Child":
                     
-                    audiotext = cardContent = "That's all I need for now. Based on what we discussed, you might be eligible to be placed in Kentucky HEALTH eligibility group for Children. Do you want to know more about your eligibility group? ";
+                    audiotext = cardContent = "Great, thanks! Based on the information you provided, you may be part of the Children eligibility group within Kentucky HEALTH. Would you like to learn more about your eligibility group? ";
                     title = "Pre-screening Results";
                     sessionend = false;
                     
                     break;
                 case "NE_Situation":
-                    audiotext = cardContent = "That's all I need for now. Based on your situation, you may not be eligible for Kentucky HEALTH.";
+                    audiotext = cardContent = "Thanks, <Name>! That’s all I need to know. Based on the information you provided, you may not be eligible for Kentucky HEALTH. For more information, please visit us online at KentuckyHEALTH.ky.gov. Have a great day!";
                     title = "Pre-screening Results";
                     sessionend = true;
                     break;
                 case "NE_Income":
-                    audiotext = cardContent = "That's all I need for now. Based on your income, you may not be eligible for Kentucky HEALTH.";
+                    audiotext = cardContent = "Thanks, <Name>! That’s all I need to know. Based on the income information you provided, you may not be eligible for Kentucky HEALTH. For more information, please visit us online at KentuckyHEALTH.ky.gov. Have a great day! ";
                     title = "Pre-screening Results";
                     sessionend = true;
                     break;
                 case "EG_Pregnant":
                     
-                    audiotext = cardContent = "That's all I need for now. Based on what we discussed, you might be eligible to be placed in Kentucky HEALTH eligibility group for Pregnant Women. Do you want to know more about your eligibility group?";
+                    audiotext = cardContent = "Great, thanks! Based on the information you provided, you may be part of the Pregnant Women eligibility group within Kentucky HEALTH. Would you like to learn more about your eligibility group?";
                     title = "Pre-screening Results";
                     sessionend = false;
                    
                     break;
                 case "EG_FosterYouth":
-                    audiotext = cardContent = "That's all I need for now. Based on what we discussed, you might be eligible to be placed in Kentucky HEALTH eligibility group for Former Foster Youth.  Do you want to know more about your eligibility group?";
+                    audiotext = cardContent = "Great, thanks! Based on the information you provided, you may be part of the Former Foster Youth eligibility group within Kentucky HEALTH. Would you like to learn more about your eligibility group?";
                     title = "Pre-screening Results";
                     sessionend = false;
                     
                     break;
                 case "EG_MedicallyFrail":
-                    audiotext = cardContent = "That's all I need for now. Based on what we discussed, you might be eligible to be placed in Kentucky HEALTH eligibility group for Medically Frail.  Do you want to know more about your eligibility group?";
+                    audiotext = cardContent = "Great, thanks! Based on the information you provided, you may be part of the Medically Frail eligibility group within Kentucky HEALTH. Would you like to learn more about your eligibility group?";
                     title = "Pre-screening Results";
                     sessionend = false;
                    
                     break;
-                //case "EG_IncomeElig":
-                //    audiotext = cardContent = "That's all I need for now. Based on what we discussed, you might be eligible to be placed in Kentucky HEALTH eligibility group for Medically Frail. To know more about this eligibility group, say: \"Tell, me more.\"";
-                //    title = "Pre-screening Results";
-                //    sessionend = false ;
-                //    slot = "conclude";
-                //    break;
+             
                 case "EG_IncomeEligParents":
-                    audiotext = cardContent = "That's all I need for now. Based on your input, your Kentucky HEALTH eligibility group may be Income-Eligible Parents/Guardians.  Do you want to know more about your eligibility group?";
+                    audiotext = cardContent = "Great, thanks! Based on the information you provided, you may be part of the Income-Eligible Parent/Guardian eligibility group within Kentucky HEALTH. Would you like to learn more about your eligibility group?";
                     title = "Pre-screening Results";
                     sessionend = false;
                    
                     break;
                 case "EG_IncEligAdult":
-                    audiotext = cardContent = "That's all I need for now. Based on your input, your Kentucky HEALTH eligibility group may be Income-Eligible Adults.  Do you want to know more about your eligibility group?";
+                    
+                    audiotext = cardContent = "Great, thanks! Based on the information you provided, you may be part of the Income-Eligible Adults eligibility group within Kentucky HEALTH. Would you like to learn more about your eligibility group?";
                     title = "Pre-screening Results";
                     sessionend = false;
                    
@@ -422,19 +416,20 @@ namespace AlexaAPICore.Controllers
                     sessionend = true;
                     break;
                 case "ERR":
-                    audiotext = cardContent = "Aaargh, the application encountered an error. Please try again later. Sorry for the inconvenience";
+                    audiotext = cardContent = "Oops, the application encountered an error. Please try again later. Sorry for the inconvenience";
                     title = "Error";
                     sessionend = true;
                     break;
 
                 default:
-                    audiotext = cardContent = "Aaargh, the application encountered an error. Please try again later. Sorry for the inconvenience";
+                    audiotext = cardContent = "Oops, the application encountered an error. Please try again later. Sorry for the inconvenience";
                     title = "Error";
                     sessionend = true;
                     break;
 
             }
             body = Helpers.GetPlainTextResponseBody(audiotext.Replace("<Name>", name), true, title);
+            body.Reprompt = new Reprompt("Sorry, I didn't hear you. Can you repeat?");
             body.ShouldEndSession = sessionend;
             if (!sessionend)
             {
@@ -460,7 +455,7 @@ namespace AlexaAPICore.Controllers
                 case "":
                     return "consent";
                 case "consent": //validate
-                    if (caseInfo.DataElements.First(p => p.Key == "consent").Value.ToLower() != "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "consent").Value.ToLower() != "y")
                     {
                         //not elig
                         return "NE_Consent";
@@ -523,25 +518,25 @@ namespace AlexaAPICore.Controllers
                         return "NE_Income";
                     }
                 case "blind_dis":
-                    if (caseInfo.DataElements.First(p => p.Key == "blind_dis").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "blind_dis").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }
                     return "medicare";//pending
                 case "medicare":
-                    if (caseInfo.DataElements.First(p => p.Key == "medicare").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "medicare").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }
                     return "nursing";//pending
                 case "nursing":
-                    if (caseInfo.DataElements.First(p => p.Key == "nursing").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "nursing").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }
                     return "foster";
                 case "foster":
-                    if (caseInfo.DataElements.First(p => p.Key == "foster").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "foster").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }
@@ -555,7 +550,7 @@ namespace AlexaAPICore.Controllers
                     }
                 case "cancer":
                 
-                    if (caseInfo.DataElements.First(p => p.Key == "cancer").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "cancer").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }
@@ -563,19 +558,19 @@ namespace AlexaAPICore.Controllers
 
                 case "ssi":
 
-                    if (caseInfo.DataElements.First(p => p.Key == "ssi").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "ssi").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }
                     return "buyin";
                 case "buyin": //no validation yet
-                    if (caseInfo.DataElements.First(p => p.Key == "buyin").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "buyin").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }
                     return "hcbs";
                 case "hcbs": //no validation yet
-                    if (caseInfo.DataElements.First(p => p.Key == "hcbs").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "hcbs").Value.ToLower() == "y")
                     {
                         return "NE_Situation";
                     }//add gender check
@@ -597,7 +592,7 @@ namespace AlexaAPICore.Controllers
                     }
                    
                 case "preg":
-                    if (caseInfo.DataElements.First(p => p.Key == "preg").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "preg").Value.ToLower() == "y")
                     {
                        
                             return "EG_Pregnant";
@@ -610,31 +605,31 @@ namespace AlexaAPICore.Controllers
                     }
                     return "ltc";
                 case "foster_eighteen":
-                    if (caseInfo.DataElements.First(p => p.Key == "foster_eighteen").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "foster_eighteen").Value.ToLower() == "y")
                     {
                         return "EG_FosterYouth";
                     }
                     return "ltc";
                 case "ltc":
-                    if (caseInfo.DataElements.First(p => p.Key == "ltc").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "ltc").Value.ToLower() == "y")
                     {
                         return "EG_MedicallyFrail";
                     }
                     return "special_needs";
                 case "special_needs":
-                    if (caseInfo.DataElements.First(p => p.Key == "special_needs").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "special_needs").Value.ToLower() == "y")
                     {
                         return "EG_MedicallyFrail";
                     }
                     return "homeless";
                 case "homeless":
-                    if (caseInfo.DataElements.First(p => p.Key == "homeless").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "homeless").Value.ToLower() == "y")
                     {
                         return "EG_MedicallyFrail";
                     }
                     return "guardian";
                 case "guardian":
-                    if (caseInfo.DataElements.First(p => p.Key == "guardian").Value.ToLower() == "yes" )
+                    if (caseInfo.DataElements.First(p => p.Key == "guardian").Value.ToLower() == "y" )
                     {
                         if (CheckIncome(caseInfo.Income, caseInfo.MemberCount))
                         {
@@ -653,7 +648,7 @@ namespace AlexaAPICore.Controllers
 
                     
                 case "conclude":
-                    if (caseInfo.DataElements.First(p => p.Key == "conclude").Value.ToLower() == "yes")
+                    if (caseInfo.DataElements.First(p => p.Key == "conclude").Value.ToLower() == "y")
                     {
                         return "End_Detail";
                     }

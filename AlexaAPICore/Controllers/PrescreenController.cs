@@ -27,7 +27,7 @@ namespace AlexaAPICore.Controllers
         {
             var fileTarget = new FileTarget("target2")
             {
-                FileName = "${basedir}/file.txt",
+                FileName = "${basedir}/file_prescreening.txt",
                 Layout = "${longdate} ${level} ${message}  ${exception}"
             };
             config.AddTarget(fileTarget);
@@ -48,14 +48,14 @@ namespace AlexaAPICore.Controllers
             }
             SkillResponse response = new SkillResponse();
             response.Version = "1.0";
-            logger.Debug("Request:" + JsonConvert.SerializeObject(alexaRequestInput.Request));
+        //    logger.Debug("Request:" + JsonConvert.SerializeObject(alexaRequestInput.Request));
 
             switch (alexaRequestInput.Request.Type)
             {
 
                 case "LaunchRequest":
 
-                    logger.Debug("Launch request in");
+                //    logger.Debug("Launch request in");
                    
                     response.Response = new ResponseBody();
                     response.Response.Card = new SimpleCard()
@@ -68,7 +68,7 @@ namespace AlexaAPICore.Controllers
                     response.Response.OutputSpeech = new PlainTextOutputSpeech() { Text = "Hello!! welcome to Childcare pre-screening! You can now say, check my eligibility" };
                     response.Response.ShouldEndSession = false;
 
-                    logger.Debug("Launch request out");
+                  //  logger.Debug("Launch request out");
                     break;
                 case "SessionEndedRequest":
                     response.Response = new ResponseBody();
@@ -142,7 +142,7 @@ namespace AlexaAPICore.Controllers
                 
                    
             }
-            logger.Debug("Response:" + JsonConvert.SerializeObject(response.Response));
+           // logger.Debug("Response:" + JsonConvert.SerializeObject(response.Response));
 
             return response;
         }
