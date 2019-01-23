@@ -136,14 +136,15 @@ namespace AlexaAPICore.Controllers
                        
                         response.Response = Helpers.GetPlainTextResponseBody("Aaargh, the application encountered an error. Please try again later. Sorry for the inconvenience", true, "Error",e.Message);
                         response.Response.ShouldEndSession = true;
+                        
                         logger.Debug(e.StackTrace);
                     }
                     break;
                 
                    
             }
-           // logger.Debug("Response:" + JsonConvert.SerializeObject(response.Response));
-
+            // logger.Debug("Response:" + JsonConvert.SerializeObject(response.Response));
+            response.Response.Reprompt = new Reprompt("Sorry, I didn't hear you, can you repeat that?");
             return response;
         }
 

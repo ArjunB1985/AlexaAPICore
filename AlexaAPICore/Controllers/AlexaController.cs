@@ -41,8 +41,17 @@ namespace AlexaAPICore.Controllers
            
 
         }
-        
-       
+
+        [HttpPost, Route("api/startyourday")]
+        public SkillResponse EntryPointStart(SkillRequest alexaRequestInput)
+        {
+            SkillResponse response = new SkillResponse();
+            response.Version = "1.0";
+            response.Response=Helpers.GetPlainTextResponseBody("Hello Everyone!! Good morning! My name is Alexa. " +
+                "I am your virtual assistant. Thanks for attending the Kentucky HEALTH demo. Arjun will show you what all I can do. Enjoy and have a great day ahead!",false);
+            response.Response.ShouldEndSession = true;
+            return response;
+        }
 
         [HttpPost, Route("api/alexa")]
         public SkillResponse EntryPoint(SkillRequest alexaRequestInput)

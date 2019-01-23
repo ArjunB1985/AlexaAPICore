@@ -69,21 +69,12 @@ namespace GameMaker.Utils
 
             msg.AddContent(MimeType.Html, "<h2>Your upcoming appointment</h2><p> "+name+", You have an appointment at Benefind office on:  "+date+" at " +time+"</p>");
 
-            var apiKey = "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";
+            var apiKey = "";
             var client = new SendGridClient(apiKey);
             var response =  await client.SendEmailAsync(msg);
 
 
 
-            //var apiKey = "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";
-            //var client = new SendGridClient(apiKey);
-            //var from = new EmailAddress("mymail.arjun@gmail.com", "Alexa Benefind Scheduler");
-            //var subject = "Your upcoming appointment";
-            //var to = new EmailAddress("mymail.arjun@gmail.com", "Arjun");
-            //var plainTextContent = "and easy to do anywhere, even with C#";
-            //var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-            //var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            //var response = await client.SendEmailAsync(msg);
 
 
         }

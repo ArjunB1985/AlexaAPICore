@@ -92,7 +92,8 @@ namespace AlexaAPICore.Controllers
                         //    response.Version = "1.0";
                         //    response.Response.ShouldEndSession = false;
                         //}
-                            if (intentRequest.Intent.Name == "PreScreen")
+                        
+                            if (intentRequest.Intent.Name == "PreScreen" )
                         {
                             UpdateModel(caseInfo, intentRequest.Intent);
                             string slot = GetNextSlot(caseInfo);
@@ -289,7 +290,7 @@ namespace AlexaAPICore.Controllers
                     title = "Household Income";
                     break;
                 case "blind_dis":
-                    audiotext = cardContent = "<Name>, Does any of the following questions apply to you? You can reply, \"Yes\", \"No\", or ask me to Repeat. Are you blind or disabled ?";
+                    audiotext = cardContent = "<Name>, Does any of the following questions apply to you? You may reply, \"Yes\", \"No\", or ask me to Repeat. Are you blind or disabled ?";
                     title = "Disablility & Blindness";
                     break;
                 case "medicare":
@@ -419,6 +420,11 @@ namespace AlexaAPICore.Controllers
                     audiotext = cardContent = "Oops, the application encountered an error. Please try again later. Sorry for the inconvenience";
                     title = "Error";
                     sessionend = true;
+                    break;
+                case "conclude":
+                    audiotext = cardContent = "Do you want more information about your eligibility group?";
+                    title = "More information.";
+                    sessionend = false ;
                     break;
 
                 default:
